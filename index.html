@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GSI Training & Human Resources</title>
+    <title>Geological Survey of India - Complete Digital Visualization System</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         * {
             margin: 0;
@@ -16,108 +18,125 @@
             font-family: Arial, sans-serif;
             background-color: #f5f5f5;
             color: #333;
+            scroll-behavior: smooth;
         }
         
-        .header {
-            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: pulse 4s ease-in-out infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(0.8); opacity: 0.5; }
-            50% { transform: scale(1.2); opacity: 0.8; }
-        }
-        
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 20px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .nav-links a {
-            background: white;
-            color: #1a237e;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
+        /* Fixed Navigation */
+        .fixed-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #1a237e;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
             transition: all 0.3s;
         }
         
-        .nav-links a:hover {
-            background: #e3f2fd;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-logo {
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+        
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .nav-menu a:hover, .nav-menu a.active {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-top: 70px;
+        }
+        
+        /* Section Styles */
+        .section {
+            min-height: 100vh;
+            padding: 40px 0;
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
         }
         
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 20px;
         }
         
-        .hero-section {
+        /* Common Header Style */
+        .section-header {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            margin-bottom: 40px;
+            border-radius: 0 0 50px 50px;
+        }
+        
+        .section-header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        .section-header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+        }
+        
+        /* Cards and Grids */
+        .card {
             background: white;
-            padding: 40px;
+            padding: 30px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            text-align: center;
+            margin-bottom: 20px;
         }
         
-        .hero-section h2 {
-            color: #1a237e;
-            font-size: 2.2em;
-            margin-bottom: 20px;
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
         
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
+            gap: 20px;
+            margin: 30px 0;
         }
         
         .stat-card {
             background: linear-gradient(135deg, #3949ab 0%, #5c6bc0 100%);
             color: white;
-            padding: 30px;
+            padding: 25px;
             border-radius: 8px;
             text-align: center;
             transition: transform 0.3s;
-            cursor: pointer;
         }
         
         .stat-card:hover {
@@ -128,248 +147,65 @@
         .stat-card h3 {
             font-size: 2.5em;
             margin-bottom: 10px;
-            font-weight: bold;
         }
         
         .stat-card p {
             opacity: 0.9;
-            font-size: 1.1em;
         }
         
-        .org-structure {
-            background: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-        
-        .org-chart {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 30px;
-        }
-        
-        .org-level {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        
-        .org-box {
+        /* Mission Cards */
+        .mission-card {
             background: #f8f9fa;
-            border: 2px solid #3949ab;
-            padding: 20px;
-            border-radius: 8px;
-            min-width: 200px;
-            text-align: center;
-            position: relative;
-            transition: all 0.3s;
-        }
-        
-        .org-box:hover {
-            background: #e3f2fd;
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        
-        .org-box.main {
-            background: #3949ab;
-            color: white;
-        }
-        
-        .org-box h4 {
-            font-size: 1.2em;
-            margin-bottom: 5px;
-        }
-        
-        .org-box p {
-            font-size: 0.9em;
-            opacity: 0.8;
-        }
-        
-        .training-section {
-            background: #f8f9fa;
-            padding: 40px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-        }
-        
-        .training-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-top: 30px;
-        }
-        
-        .training-card {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-        }
-        
-        .training-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-        
-        .training-header {
-            background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
-            color: white;
-            padding: 25px;
-        }
-        
-        .training-header h3 {
-            font-size: 1.5em;
-            margin-bottom: 5px;
-        }
-        
-        .training-body {
-            padding: 25px;
-        }
-        
-        .training-body ul {
-            list-style: none;
-        }
-        
-        .training-body li {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-        }
-        
-        .training-body li:last-child {
-            border-bottom: none;
-        }
-        
-        .training-body li::before {
-            content: '📚';
-            margin-right: 10px;
-        }
-        
-        .course-categories {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        
-        .category-card {
-            background: white;
             padding: 25px;
             border-radius: 8px;
             border-left: 4px solid #3949ab;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             transition: all 0.3s;
         }
         
-        .category-card:hover {
+        .mission-card:hover {
             transform: translateX(5px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         
-        .category-card h4 {
-            color: #1a237e;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .category-icon {
-            font-size: 24px;
-        }
-        
-        .regional-centers {
-            background: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-        
-        .centers-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-        
-        .center-card {
-            background: linear-gradient(135deg, #f5f5f5 0%, #e8eaf6 100%);
-            padding: 25px;
-            border-radius: 8px;
-            text-align: center;
-            transition: all 0.3s;
-        }
-        
-        .center-card:hover {
-            background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
-            transform: scale(1.02);
-        }
-        
-        .center-card h4 {
+        .mission-card h3 {
             color: #1a237e;
             margin-bottom: 15px;
         }
         
-        .center-card p {
-            color: #666;
-            line-height: 1.6;
+        .mission-card ul {
+            list-style: none;
         }
         
-        .facilities-section {
-            background: #f8f9fa;
-            padding: 40px;
-            border-radius: 8px;
-            margin-bottom: 30px;
+        .mission-card li {
+            padding: 5px 0;
         }
         
-        .facility-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        
-        .facility-item {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-        }
-        
-        .facility-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        
-        .facility-icon {
-            font-size: 36px;
-            margin-bottom: 15px;
+        .mission-card li:before {
+            content: "▸ ";
             color: #3949ab;
+            font-weight: bold;
         }
         
-        .capacity-building {
-            background: white;
-            padding: 40px;
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 30px 0;
+        }
+        
+        /* Map Container */
+        .map-container {
+            height: 600px;
+            margin: 30px 0;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         
+        /* Timeline */
         .timeline {
             position: relative;
-            padding: 20px 0;
-            margin-top: 30px;
+            padding: 50px 0;
         }
         
         .timeline::before {
@@ -379,141 +215,252 @@
             left: 50%;
             width: 3px;
             height: 100%;
-            background: #3949ab;
+            background: linear-gradient(to bottom, #1a237e, #3949ab, #5c6bc0);
             transform: translateX(-50%);
         }
         
         .timeline-item {
             position: relative;
-            padding: 20px;
-            margin-bottom: 20px;
-            width: 48%;
+            margin-bottom: 50px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.6s forwards;
         }
         
-        .timeline-item:nth-child(odd) {
-            left: 0;
-        }
+        .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+        .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+        .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+        .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+        .timeline-item:nth-child(5) { animation-delay: 0.5s; }
         
-        .timeline-item:nth-child(even) {
-            left: 52%;
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .timeline-content {
             background: #f8f9fa;
-            padding: 20px;
+            padding: 25px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            width: 45%;
+            position: relative;
         }
         
-        .timeline-year {
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-left: auto;
+        }
+        
+        .timeline-date {
             position: absolute;
             top: 20px;
             font-weight: bold;
             color: #1a237e;
+            font-size: 1.2em;
         }
         
-        .timeline-item:nth-child(odd) .timeline-year {
-            right: -70px;
+        .timeline-item:nth-child(odd) .timeline-date {
+            left: 47%;
+            transform: translateX(-100%);
+            margin-left: -70px;
         }
         
-        .timeline-item:nth-child(even) .timeline-year {
-            left: -70px;
+        .timeline-item:nth-child(even) .timeline-date {
+            right: 47%;
+            transform: translateX(100%);
+            margin-right: -70px;
         }
         
-        .chart-container {
-            position: relative;
-            height: 400px;
-            margin: 30px 0;
-        }
-        
-        .international-programs {
-            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-            color: white;
-            padding: 40px;
-            border-radius: 8px;
-            margin: 30px 0;
-        }
-        
-        .int-program-grid {
+        /* Gallery Grid */
+        .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 25px;
             margin-top: 30px;
         }
         
-        .int-program-card {
-            background: rgba(255,255,255,0.1);
-            padding: 25px;
+        .gallery-item {
+            background: white;
             border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.2);
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             transition: all 0.3s;
-        }
-        
-        .int-program-card:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-3px);
-        }
-        
-        .int-program-card h4 {
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-        
-        .int-program-card p {
-            opacity: 0.9;
-            line-height: 1.6;
-        }
-        
-        .section-title {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .section-title h2 {
-            color: #1a237e;
-            font-size: 2.2em;
-            margin-bottom: 10px;
-        }
-        
-        .section-title p {
-            color: #666;
-            font-size: 1.1em;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.8);
-        }
-        
-        .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 700px;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-        }
-        
-        .close {
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            font-size: 28px;
             cursor: pointer;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .gallery-item-header {
+            background: #e0e0e0;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
             color: #999;
         }
         
-        .close:hover {
-            color: #333;
+        .gallery-item-content {
+            padding: 20px;
+        }
+        
+        .gallery-item-content h3 {
+            color: #1a237e;
+            margin-bottom: 10px;
+        }
+        
+        .gallery-item-content p {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .tab-button {
+            background: #3949ab;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+        
+        .tab-button:hover {
+            background: #283593;
+            transform: translateY(-2px);
+        }
+        
+        .tab-button.active {
+            background: #1a237e;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .timeline-content {
+                width: 100%;
+                margin-left: 0 !important;
+            }
+            
+            .timeline::before {
+                left: 30px;
+            }
+            
+            .timeline-date {
+                position: static !important;
+                margin-bottom: 10px;
+                transform: none !important;
+            }
+            
+            .section-header h1 {
+                font-size: 2em;
+            }
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .nav-menu {
+                position: fixed;
+                top: 60px;
+                right: -300px;
+                width: 250px;
+                height: 100vh;
+                background: #1a237e;
+                flex-direction: column;
+                padding: 20px;
+                transition: right 0.3s;
+            }
+            
+            .nav-menu.active {
+                right: 0;
+            }
+        }
+        
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading::after {
+            content: "Loading...";
+            display: inline-block;
+            animation: dots 1.5s infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: "Loading."; }
+            40% { content: "Loading.."; }
+            60%, 100% { content: "Loading..."; }
+        }
+        
+        /* Special Sections */
+        .achievement-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .achievement-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .achievement-header {
+            background: linear-gradient(135deg, #3949ab 0%, #5c6bc0 100%);
+            color: white;
+            padding: 20px;
+        }
+        
+        .achievement-body {
+            padding: 25px;
         }
         
         .badge {
@@ -526,630 +473,866 @@
             margin-left: 10px;
         }
         
+        /* Image Placeholders with Icons */
         .image-placeholder {
             background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
-            height: 200px;
+            height: 250px;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #999;
-            font-size: 1.1em;
-            margin-bottom: 20px;
+            font-size: 1.2em;
             position: relative;
             overflow: hidden;
         }
         
         .image-placeholder::before {
-            content: '🏛️';
+            content: '🖼️';
             font-size: 48px;
             position: absolute;
             opacity: 0.3;
         }
-        
-        @media (max-width: 768px) {
-            .timeline-item {
-                width: 100%;
-                left: 0 !important;
-            }
-            
-            .timeline::before {
-                left: 20px;
-            }
-            
-            .timeline-year {
-                position: static !important;
-                margin-bottom: 10px;
-            }
-        }
-        
-        .hr-policy-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        
-        .policy-card {
-            background: #e3f2fd;
-            padding: 25px;
-            border-radius: 8px;
-            border-left: 4px solid #1a237e;
-        }
-        
-        .policy-card h4 {
-            color: #1a237e;
-            margin-bottom: 15px;
-        }
-        
-        .policy-card ul {
-            list-style: none;
-        }
-        
-        .policy-card li {
-            padding: 5px 0;
-        }
-        
-        .policy-card li::before {
-            content: '✓';
-            color: #4caf50;
-            font-weight: bold;
-            margin-right: 10px;
-        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>GSI Training & Human Resources</h1>
-        <p>Building Capacity for Geoscientific Excellence</p>
-        <div class="nav-links">
-            <a href="gsi_dashboard.html">Main Dashboard</a>
-            <a href="gsi_visual_gallery.html">Visual Gallery</a>
-            <a href="gsi_achievements.html">Achievements</a>
+    <!-- Fixed Navigation -->
+    <nav class="fixed-nav">
+        <div class="nav-container">
+            <div class="nav-logo">GSI Digital Portal</div>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#home" class="nav-link active" onclick="showSection('home')">Home</a></li>
+                <li><a href="#dashboard" class="nav-link" onclick="showSection('dashboard')">Dashboard</a></li>
+                <li><a href="#gallery" class="nav-link" onclick="showSection('gallery')">Visual Gallery</a></li>
+                <li><a href="#achievements" class="nav-link" onclick="showSection('achievements')">Achievements</a></li>
+                <li><a href="#training" class="nav-link" onclick="showSection('training')">Training & HR</a></li>
+            </ul>
         </div>
-    </div>
+    </nav>
     
-    <div class="container">
-        <!-- Hero Section with Statistics -->
-        <div class="hero-section">
-            <h2>GSI Training Institute</h2>
-            <p>Established in 1976 • A premier institution for geoscientific training in India</p>
+    <div class="main-content">
+        <!-- Home Section -->
+        <section id="home" class="section active">
+            <div class="section-header">
+                <h1>Geological Survey of India</h1>
+                <p>भारतीय भूवैज्ञानिक सर्वेक्षण</p>
+                <p style="font-size: 1em; opacity: 0.8;">Digital Visualization System • Est. 1851</p>
+            </div>
             
-            <div class="stats-grid">
-                <div class="stat-card" onclick="showDetails('employees')">
-                    <h3>6,718</h3>
-                    <p>Total Employees</p>
+            <div class="container">
+                <div class="card" style="text-align: center;">
+                    <h2 style="color: #1a237e; margin-bottom: 20px;">Welcome to GSI Digital Portal</h2>
+                    <p style="font-size: 1.1em; line-height: 1.8; max-width: 800px; margin: 0 auto;">
+                        Explore the comprehensive digital transformation of the Geological Survey of India's information. 
+                        This interactive system provides detailed insights into GSI's 167+ years of excellence in earth sciences, 
+                        from its historic achievements to future roadmap.
+                    </p>
                 </div>
-                <div class="stat-card" onclick="showDetails('training')">
-                    <h3>50+</h3>
-                    <p>Training Courses</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>1851</h3>
+                        <p>Year Established</p>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);">
+                        <h3>6,718</h3>
+                        <p>Total Employees</p>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #ff5722 0%, #ff7043 100%);">
+                        <h3>100%</h3>
+                        <p>India Mapped</p>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);">
+                        <h3>32</h3>
+                        <p>National Monuments</p>
+                    </div>
                 </div>
-                <div class="stat-card" onclick="showDetails('centers')">
-                    <h3>6</h3>
-                    <p>Regional Centers</p>
-                </div>
-                <div class="stat-card" onclick="showDetails('trainees')">
-                    <h3>1000+</h3>
-                    <p>Annual Trainees</p>
+                
+                <div class="grid" style="margin-top: 40px;">
+                    <div class="card">
+                        <h3 style="color: #1a237e; margin-bottom: 15px;">📊 Explore Dashboard</h3>
+                        <p>Access comprehensive overview of GSI's structure, missions, resources, and operations.</p>
+                        <button class="tab-button" style="margin-top: 15px;" onclick="showSection('dashboard')">View Dashboard →</button>
+                    </div>
+                    <div class="card">
+                        <h3 style="color: #1a237e; margin-bottom: 15px;">🗺️ Visual Gallery</h3>
+                        <p>Browse interactive maps, geological features, and field equipment galleries.</p>
+                        <button class="tab-button" style="margin-top: 15px;" onclick="showSection('gallery')">View Gallery →</button>
+                    </div>
+                    <div class="card">
+                        <h3 style="color: #1a237e; margin-bottom: 15px;">🏆 Achievements</h3>
+                        <p>Discover milestones, technological advances, and future vision of GSI.</p>
+                        <button class="tab-button" style="margin-top: 15px;" onclick="showSection('achievements')">View Achievements →</button>
+                    </div>
+                    <div class="card">
+                        <h3 style="color: #1a237e; margin-bottom: 15px;">🎓 Training & HR</h3>
+                        <p>Learn about capacity building initiatives and human resource development.</p>
+                        <button class="tab-button" style="margin-top: 15px;" onclick="showSection('training')">View Training →</button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
         
-        <!-- Organizational Structure -->
-        <div class="org-structure">
-            <div class="section-title">
-                <h2>Organizational Structure</h2>
-                <p>Hierarchical arrangement ensuring efficient functioning</p>
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section">
+            <div class="section-header">
+                <h1>GSI Dashboard</h1>
+                <p>Comprehensive Overview of India's Premier Geoscience Organization</p>
             </div>
             
-            <div class="org-chart">
-                <div class="org-level">
-                    <div class="org-box main">
-                        <h4>Director General</h4>
-                        <p>Central Headquarters, Kolkata</p>
+            <div class="container">
+                <!-- About GSI -->
+                <div class="card">
+                    <h2 style="color: #1a237e; margin-bottom: 20px;">About GSI</h2>
+                    <div class="grid">
+                        <div>
+                            <p style="line-height: 1.8;">
+                                The Geological Survey of India (GSI) is one of the oldest organizations in the world and the second oldest in India. 
+                                Established in 1851, GSI has grown into a repository of geo-science information through systematic geological mapping 
+                                and mineral exploration. Today, GSI is an attached office to the Ministry of Mines with headquarters at Kolkata.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 style="color: #1a237e; margin-bottom: 10px;">Key Functions:</h4>
+                            <ul style="list-style: none;">
+                                <li>▸ Systematic geological mapping</li>
+                                <li>▸ Mineral resource assessment</li>
+                                <li>▸ Marine surveys and exploration</li>
+                                <li>▸ Geotechnical investigations</li>
+                                <li>▸ Geoinformatics and data dissemination</li>
+                                <li>▸ Research in fundamental geosciences</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="org-level">
-                    <div class="org-box">
-                        <h4>Additional Director Generals</h4>
-                        <p>Mission Heads & Regional Directors</p>
-                    </div>
-                    <div class="org-box">
-                        <h4>Deputy Director Generals</h4>
-                        <p>Divisional Heads</p>
+                <!-- GSI Missions -->
+                <div class="card">
+                    <h2 style="color: #1a237e; margin-bottom: 20px;">GSI Missions</h2>
+                    <div class="grid">
+                        <div class="mission-card">
+                            <h3>Mission I: Baseline Geoscience Data</h3>
+                            <ul>
+                                <li>Systematic Geological Mapping</li>
+                                <li>Specialized Thematic Mapping</li>
+                                <li>National Geochemical Mapping</li>
+                                <li>National Geophysical Mapping</li>
+                                <li>Marine & Coastal Surveys</li>
+                            </ul>
+                        </div>
+                        <div class="mission-card">
+                            <h3>Mission II: Natural Resources</h3>
+                            <ul>
+                                <li>Mineral Resource Assessment</li>
+                                <li>Coal and Energy Resources</li>
+                                <li>Critical mineral exploration</li>
+                                <li>Strategic mineral assessment</li>
+                                <li>Industrial minerals</li>
+                            </ul>
+                        </div>
+                        <div class="mission-card">
+                            <h3>Mission III: Geoinformatics</h3>
+                            <ul>
+                                <li>IT Infrastructure</li>
+                                <li>Data Repository</li>
+                                <li>Information Delivery</li>
+                                <li>Map Production</li>
+                                <li>OCBIS System</li>
+                            </ul>
+                        </div>
+                        <div class="mission-card">
+                            <h3>Mission IV: Multidisciplinary</h3>
+                            <ul>
+                                <li>Fundamental Research</li>
+                                <li>Landslide Studies</li>
+                                <li>Earthquake Research</li>
+                                <li>Environmental Studies</li>
+                                <li>Polar Research</li>
+                            </ul>
+                        </div>
+                        <div class="mission-card">
+                            <h3>Mission V: Training</h3>
+                            <ul>
+                                <li>Capacity Building</li>
+                                <li>Training Programs</li>
+                                <li>Knowledge Sharing</li>
+                                <li>Skill Development</li>
+                                <li>International Training</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="org-level">
-                    <div class="org-box">
-                        <h4>Directors</h4>
-                        <p>Operational Units</p>
+                <!-- Resource Statistics -->
+                <div class="card">
+                    <h2 style="color: #1a237e; margin-bottom: 20px;">Mineral Resources</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>306,596 Mt</h3>
+                            <p>Coal Resources</p>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #ff5722 0%, #ff7043 100%);">
+                            <h3>14,532 Mt</h3>
+                            <p>Iron Ore Resources</p>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);">
+                            <h3>93,039 Mt</h3>
+                            <p>Limestone Resources</p>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #ffc107 0%, #ffca28 100%);">
+                            <h3>187 Mt</h3>
+                            <p>Gold Resources</p>
+                        </div>
                     </div>
-                    <div class="org-box">
-                        <h4>Deputy Directors</h4>
-                        <p>Field Units</p>
+                    <div class="chart-container">
+                        <canvas id="resourceChart"></canvas>
                     </div>
-                    <div class="org-box">
-                        <h4>Assistant Directors</h4>
-                        <p>Project Leaders</p>
+                </div>
+                
+                <!-- Regional Offices -->
+                <div class="card">
+                    <h2 style="color: #1a237e; margin-bottom: 20px;">Regional Headquarters</h2>
+                    <div class="grid">
+                        <div style="background: #e3f2fd; padding: 20px; border-radius: 8px;">
+                            <h4 style="color: #1a237e;">Central HQ - Kolkata</h4>
+                            <p>27, Jawaharlal Nehru Road, Kolkata - 700016</p>
+                        </div>
+                        <div style="background: #e3f2fd; padding: 20px; border-radius: 8px;">
+                            <h4 style="color: #1a237e;">Northern Region</h4>
+                            <p>Plot-2, Sec-E, Aliganj, Lucknow - 226024</p>
+                        </div>
+                        <div style="background: #e3f2fd; padding: 20px; border-radius: 8px;">
+                            <h4 style="color: #1a237e;">Southern Region</h4>
+                            <p>GSI Complex, Bandlaguda, Hyderabad - 500066</p>
+                        </div>
+                        <div style="background: #e3f2fd; padding: 20px; border-radius: 8px;">
+                            <h4 style="color: #1a237e;">Western Region</h4>
+                            <p>15&16 Jhalana Institute Area, Jaipur - 302004</p>
+                        </div>
+                        <div style="background: #e3f2fd; padding: 20px; border-radius: 8px;">
+                            <h4 style="color: #1a237e;">Central Region</h4>
+                            <p>Block-A, Seminary Hills, Nagpur - 440006</p>
+                        </div>
+                        <div style="background: #e3f2fd; padding: 20px; border-radius: 8px;">
+                            <h4 style="color: #1a237e;">North-Eastern Region</h4>
+                            <p>Bareh Building, Shillong - 793014</p>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="chart-container">
-                <canvas id="staffChart"></canvas>
-            </div>
-        </div>
+        </section>
         
-        <!-- Training Programs -->
-        <div class="training-section">
-            <div class="section-title">
-                <h2>Training Programs Offered</h2>
-                <p>Comprehensive courses for all levels of geoscientific expertise</p>
+        <!-- Visual Gallery Section -->
+        <section id="gallery" class="section">
+            <div class="section-header">
+                <h1>Visual Gallery</h1>
+                <p>Maps, Geological Features & Field Equipment</p>
             </div>
             
-            <div class="training-grid">
-                <div class="training-card">
-                    <div class="training-header">
-                        <h3>Induction Level Courses</h3>
-                        <p>For new recruits</p>
-                    </div>
-                    <div class="training-body">
-                        <ul>
-                            <li>Orientation Course for Geologists</li>
-                            <li>Orientation Course for Geophysicists</li>
-                            <li>Orientation Course for Chemists</li>
-                            <li>Orientation Course for Engineers</li>
-                            <li>Administrative Streams Training</li>
-                            <li>Office Procedures & Finance</li>
-                        </ul>
+            <div class="container">
+                <!-- Tab Navigation -->
+                <div class="tab-nav">
+                    <button class="tab-button active" onclick="showGalleryTab('maps')">Regional Maps</button>
+                    <button class="tab-button" onclick="showGalleryTab('geological')">Geological Features</button>
+                    <button class="tab-button" onclick="showGalleryTab('resources')">Resource Maps</button>
+                    <button class="tab-button" onclick="showGalleryTab('equipment')">Equipment</button>
+                    <button class="tab-button" onclick="showGalleryTab('monuments')">National Monuments</button>
+                </div>
+                
+                <!-- Maps Tab -->
+                <div id="maps-tab" class="tab-content active">
+                    <div class="card">
+                        <h2 style="color: #1a237e; margin-bottom: 20px;">GSI Regional Distribution Map</h2>
+                        <p>The Geological Survey of India operates through 6 regional headquarters and numerous field offices across the nation.</p>
+                        <div id="regionalMap" class="map-container"></div>
                     </div>
                 </div>
                 
-                <div class="training-card">
-                    <div class="training-header" style="background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);">
-                        <h3>Advanced Technical Courses</h3>
-                        <p>Specialized training</p>
-                    </div>
-                    <div class="training-body">
-                        <ul>
-                            <li>Conceptual Modeling in Mineral Exploration</li>
-                            <li>3D Modeling using SURPAC</li>
-                            <li>GEOSOFT for Gravity & Magnetic Data</li>
-                            <li>Remote Sensing & GIS Applications</li>
-                            <li>Geochemical Data Processing</li>
-                            <li>Airborne Survey Interpretation</li>
-                        </ul>
+                <!-- Geological Features Tab -->
+                <div id="geological-tab" class="tab-content">
+                    <h2 style="color: #1a237e; margin-bottom: 20px;">Geological Features & Formations</h2>
+                    <div class="gallery-grid">
+                        <div class="gallery-item">
+                            <div class="gallery-item-header">🌋</div>
+                            <div class="gallery-item-content">
+                                <h3>Columnar Basalt Jointing</h3>
+                                <p>Location: Palasi village, Dewas district, M.P.<br>
+                                Formation: Cooling and contraction of basaltic lava</p>
+                            </div>
+                        </div>
+                        <div class="gallery-item">
+                            <div class="gallery-item-header">🗿</div>
+                            <div class="gallery-item-content">
+                                <h3>Pillow Lava Formation</h3>
+                                <p>Location: Maradihalli, Chitradurga district, Karnataka<br>
+                                Age: Archaean period</p>
+                            </div>
+                        </div>
+                        <div class="gallery-item">
+                            <div class="gallery-item-header">🪨</div>
+                            <div class="gallery-item-content">
+                                <h3>Stromatolite Structures</h3>
+                                <p>Location: Chittaurgarh district, Rajasthan<br>
+                                Significance: Evidence of ancient microbial life</p>
+                            </div>
+                        </div>
+                        <div class="gallery-item">
+                            <div class="gallery-item-header">⛰️</div>
+                            <div class="gallery-item-content">
+                                <h3>Fold Structures</h3>
+                                <p>Various locations across Indian shield<br>
+                                Result of compressional tectonics</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="training-card">
-                    <div class="training-header" style="background: linear-gradient(135deg, #ff5722 0%, #ff7043 100%);">
-                        <h3>Specialized Programs</h3>
-                        <p>Domain expertise</p>
+                <!-- Resources Tab -->
+                <div id="resources-tab" class="tab-content">
+                    <h2 style="color: #1a237e; margin-bottom: 20px;">Mineral Resource Distribution</h2>
+                    <div class="grid">
+                        <div class="card">
+                            <h3 style="color: #1a237e;">Coal & Lignite Distribution</h3>
+                            <div class="image-placeholder">Coal Belt Map</div>
+                            <ul style="margin-top: 15px; list-style: none;">
+                                <li>▸ Jharia Coalfield</li>
+                                <li>▸ Raniganj Coalfield</li>
+                                <li>▸ Singrauli Coalfield</li>
+                                <li>▸ Talcher Coalfield</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3 style="color: #1a237e;">Iron Ore Deposits</h3>
+                            <div class="image-placeholder">Iron Ore Belt</div>
+                            <ul style="margin-top: 15px; list-style: none;">
+                                <li>▸ Bailadila, Chhattisgarh</li>
+                                <li>▸ Bellary-Hospet, Karnataka</li>
+                                <li>▸ Keonjhar, Odisha</li>
+                                <li>▸ Kudremukh, Karnataka</li>
+                            </ul>
+                        </div>
                     </div>
-                    <div class="training-body">
-                        <ul>
-                            <li>Diamond Exploration Techniques</li>
-                            <li>Gold Exploration Methods</li>
-                            <li>Base Metal Exploration</li>
-                            <li>PGE Exploration Strategies</li>
-                            <li>Coal & Lignite Assessment</li>
-                            <li>Geotechnical Investigations</li>
-                        </ul>
+                </div>
+                
+                <!-- Equipment Tab -->
+                <div id="equipment-tab" class="tab-content">
+                    <h2 style="color: #1a237e; margin-bottom: 20px;">Survey Equipment & Vessels</h2>
+                    <div class="gallery-grid">
+                        <div class="gallery-item">
+                            <div class="gallery-item-header">🚢</div>
+                            <div class="gallery-item-content">
+                                <h3>R.V. Samudra Ratnakar</h3>
+                                <p>Deep sea research vessel for marine geological surveys with multi-channel seismic capability</p>
+                            </div>
+                        </div>
+                        <div class="gallery-item">
+                            <div class="gallery-item-header">✈️</div>
+                            <div class="gallery-item-content">
+                                <h3>TOASS Aircraft</h3>
+                                <p>Twin Otter Airborne Survey System covering 5,89,412 sq km for geophysical surveys</p>
+                            </div>
+                        </div>
+                        <div class="gallery-item">
+                            <div class="gallery-item-header">🤖</div>
+                            <div class="gallery-item-content">
+                                <h3>ROV Systems</h3>
+                                <p>Remotely Operated Vehicles for deep sea exploration up to 6000m depth</p>
+                            </div>
+                        </div>
+                        <div class="gallery-item">
+                            <div class="gallery-item-header">🔬</div>
+                            <div class="gallery-item-content">
+                                <h3>LA-MC-ICPMS</h3>
+                                <p>Advanced laboratory instrument for high precision isotope analysis</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Monuments Tab -->
+                <div id="monuments-tab" class="tab-content">
+                    <h2 style="color: #1a237e; margin-bottom: 20px;">National Geological Monuments</h2>
+                    <p>GSI has identified 32 sites as National Geological Monuments to preserve India's geological heritage</p>
+                    <div class="gallery-grid" style="margin-top: 30px;">
+                        <div class="gallery-item">
+                            <div class="gallery-item-header">🏛️</div>
+                            <div class="gallery-item-content">
+                                <h3>Marine Gondwana Fossils</h3>
+                                <p>Location: Sarguja district, Chhattisgarh<br>
+                                Rare marine fossils in Gondwana sediments</p>
+                            </div>
+                        </div>
+                        <div class="gallery-item">
+                            <div class="gallery-item-header">🦴</div>
+                            <div class="gallery-item-content">
+                                <h3>Siwalik Vertebrate Fossil Park</h3>
+                                <p>Location: Sirmur district, Himachal Pradesh<br>
+                                Age: Miocene-Pliocene period</p>
+                            </div>
+                        </div>
+                        <div class="gallery-item">
+                            <div class="gallery-item-header">🪨</div>
+                            <div class="gallery-item-content">
+                                <h3>Eparchaean Unconformity</h3>
+                                <p>Location: Tirumala Hills, Andhra Pradesh<br>
+                                Major geological time gap</p>
+                            </div>
+                        </div>
+                        <div class="gallery-item">
+                            <div class="gallery-item-header">💎</div>
+                            <div class="gallery-item-content">
+                                <h3>St. Mary's Island</h3>
+                                <p>Location: Karnataka Coast<br>
+                                Hexagonal basaltic columns</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
         
-        <!-- Course Categories -->
-        <div class="facilities-section">
-            <div class="section-title">
-                <h2>Course Categories</h2>
-                <p>Diverse range of training programs</p>
+        <!-- Achievements Section -->
+        <section id="achievements" class="section">
+            <div class="section-header">
+                <h1>Achievements & Future Vision</h1>
+                <p>167 Years of Excellence in Earth Sciences</p>
             </div>
             
-            <div class="course-categories">
-                <div class="category-card">
-                    <h4><span class="category-icon">🗺️</span>Geological Mapping</h4>
-                    <ul>
-                        <li>Systematic Geological Mapping</li>
-                        <li>Field Geological Techniques</li>
-                        <li>Structural Geology & Shear Zones</li>
-                        <li>High Grade Metamorphic Terrain</li>
-                        <li>Quaternary & Paleoclimatic Studies</li>
-                    </ul>
+            <div class="container">
+                <!-- Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>167+</h3>
+                        <p>Years of Service</p>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);">
+                        <h3>100%</h3>
+                        <p>India Mapped</p>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #ff5722 0%, #ff7043 100%);">
+                        <h3>500+</h3>
+                        <p>Mineral Deposits</p>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);">
+                        <h3>1500+</h3>
+                        <p>Publications</p>
+                    </div>
                 </div>
                 
-                <div class="category-card">
-                    <h4><span class="category-icon">💻</span>Digital Technologies</h4>
-                    <ul>
-                        <li>Geographic Information System (GIS)</li>
-                        <li>Remote Sensing Applications</li>
-                        <li>Digital Image Processing</li>
-                        <li>Surveying using DGPS & Total Station</li>
-                        <li>Mobile Apps for Field Mapping</li>
-                    </ul>
+                <!-- Timeline -->
+                <div class="card">
+                    <h2 style="color: #1a237e; margin-bottom: 20px; text-align: center;">Major Milestones</h2>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-date">1836</div>
+                            <div class="timeline-content">
+                                <h3>Pre-Independence Era Begins</h3>
+                                <p>Coal exploration initiated by East India Company to explore coal deposits for railways.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">1851</div>
+                            <div class="timeline-content">
+                                <h3>GSI Formally Established</h3>
+                                <p>Established on 4th March with Thomas Oldham as the first Superintendent.</p>
+                                <span class="badge">Foundation</span>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">1965</div>
+                            <div class="timeline-content">
+                                <h3>Marine Wing Established</h3>
+                                <p>Set up Marine Unit to explore offshore mineral resources.</p>
+                                <span class="badge">New Domain</span>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">1981</div>
+                            <div class="timeline-content">
+                                <h3>Antarctic Research Begins</h3>
+                                <p>GSI joins India's Antarctic program, establishing 'Dakshin Gangotri' station.</p>
+                                <span class="badge">International</span>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">2017</div>
+                            <div class="timeline-content">
+                                <h3>OCBIS Launched</h3>
+                                <p>Online Core Business Integrated System launched for digital transformation.</p>
+                                <span class="badge">Digital Era</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="category-card">
-                    <h4><span class="category-icon">🔬</span>Laboratory Techniques</h4>
-                    <ul>
-                        <li>EPMA Techniques</li>
-                        <li>Isotope Geochronology</li>
-                        <li>Fluid Inclusion Studies</li>
-                        <li>Raman Spectroscopy</li>
-                        <li>Precious Metal Analysis</li>
-                    </ul>
+                <!-- Major Achievements -->
+                <h2 style="color: #1a237e; margin: 40px 0 20px; text-align: center;">Major Achievements</h2>
+                <div class="grid">
+                    <div class="achievement-card">
+                        <div class="achievement-header">
+                            <h3>Mineral Discoveries</h3>
+                            <p>Resource Assessment Success</p>
+                        </div>
+                        <div class="achievement-body">
+                            <ul style="list-style: none;">
+                                <li>✓ Discovered 10 major coalfields including Singrauli</li>
+                                <li>✓ Identified Baula-Nuasahi PGE deposits (16.021 Mt)</li>
+                                <li>✓ Located Malanjkhand copper deposits</li>
+                                <li>✓ Found gold deposits (186.667 Mt)</li>
+                                <li>✓ Identified 340 geothermal springs</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="achievement-card">
+                        <div class="achievement-header" style="background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);">
+                            <h3>Mapping Excellence</h3>
+                            <p>Systematic Coverage</p>
+                        </div>
+                        <div class="achievement-body">
+                            <ul style="list-style: none;">
+                                <li>✓ 100% geological mapping at 1:50,000 scale</li>
+                                <li>✓ Published 4,000+ geological maps</li>
+                                <li>✓ Marine mapping of entire EEZ</li>
+                                <li>✓ 8.1 lakh sq km aero-geophysical surveys</li>
+                                <li>✓ Digital geological database creation</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="achievement-card">
+                        <div class="achievement-header" style="background: linear-gradient(135deg, #ff5722 0%, #ff7043 100%);">
+                            <h3>Scientific Publications</h3>
+                            <p>Knowledge Dissemination</p>
+                        </div>
+                        <div class="achievement-body">
+                            <ul style="list-style: none;">
+                                <li>✓ 134 Memoirs published</li>
+                                <li>✓ 150 Records documenting</li>
+                                <li>✓ 247 Bulletins</li>
+                                <li>✓ 71 volumes of IJG</li>
+                                <li>✓ 21,669 digital reports</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="category-card">
-                    <h4><span class="category-icon">🌊</span>Marine & Airborne</h4>
-                    <ul>
-                        <li>Marine Survey Techniques</li>
-                        <li>Airborne Geophysical Surveys</li>
-                        <li>Multi-channel Seismic</li>
-                        <li>Remote Sensing in Marine Domain</li>
-                        <li>Coastal Zone Management</li>
-                    </ul>
+                <!-- Technology Evolution -->
+                <div class="card" style="margin-top: 40px;">
+                    <h2 style="color: #1a237e; margin-bottom: 20px;">Technological Evolution</h2>
+                    <div class="chart-container">
+                        <canvas id="techChart"></canvas>
+                    </div>
                 </div>
                 
-                <div class="category-card">
-                    <h4><span class="category-icon">⚒️</span>Mineral Exploration</h4>
-                    <ul>
-                        <li>Strategic Mineral Resources</li>
-                        <li>Critical Mineral Exploration</li>
-                        <li>Industrial & Fertilizer Minerals</li>
-                        <li>Geochemical Exploration</li>
-                        <li>Geophysical Methods</li>
-                    </ul>
-                </div>
-                
-                <div class="category-card">
-                    <h4><span class="category-icon">📊</span>Management Programs</h4>
-                    <ul>
-                        <li>Management Development Programs</li>
-                        <li>Project Management</li>
-                        <li>Financial Management</li>
-                        <li>Vigilance & Administration</li>
-                        <li>Hindi as Rajbhasha</li>
-                    </ul>
+                <!-- Future Roadmap -->
+                <div class="card">
+                    <h2 style="color: #1a237e; margin-bottom: 30px; text-align: center;">Future Roadmap</h2>
+                    <div class="grid">
+                        <div style="background: #e3f2fd; padding: 25px; border-radius: 8px;">
+                            <h3 style="color: #1a237e;">2024-25: Digital Transformation</h3>
+                            <ul style="list-style: none; margin-top: 15px;">
+                                <li>→ AI-powered mineral prospecting</li>
+                                <li>→ Cloud-based data repository</li>
+                                <li>→ Mobile apps for field mapping</li>
+                            </ul>
+                        </div>
+                        <div style="background: #e8f5e9; padding: 25px; border-radius: 8px;">
+                            <h3 style="color: #1a237e;">2025-27: Deep Earth Exploration</h3>
+                            <ul style="list-style: none; margin-top: 15px;">
+                                <li>→ 3D geological modeling</li>
+                                <li>→ Deep drilling projects</li>
+                                <li>→ Subsurface mapping to 5km</li>
+                            </ul>
+                        </div>
+                        <div style="background: #fff3e0; padding: 25px; border-radius: 8px;">
+                            <h3 style="color: #1a237e;">2027-30: Blue Economy</h3>
+                            <ul style="list-style: none; margin-top: 15px;">
+                                <li>→ Complete EEZ assessment</li>
+                                <li>→ Deep sea mining feasibility</li>
+                                <li>→ Marine ecosystem mapping</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
         
-        <!-- Regional Training Centers -->
-        <div class="regional-centers">
-            <div class="section-title">
-                <h2>Regional Training Centers</h2>
-                <p>Strategic locations across India</p>
+        <!-- Training & HR Section -->
+        <section id="training" class="section">
+            <div class="section-header">
+                <h1>Training & Human Resources</h1>
+                <p>Building Capacity for Geoscientific Excellence</p>
             </div>
             
-            <div class="centers-grid">
-                <div class="center-card">
-                    <h4>TI Headquarters</h4>
-                    <div class="image-placeholder">Hyderabad Campus</div>
-                    <p>Main training facility at Bandlaguda, Hyderabad with state-of-the-art classrooms, laboratories, and accommodation facilities</p>
-                </div>
-                
-                <div class="center-card">
-                    <h4>Field Training Center - Zawar</h4>
-                    <div class="image-placeholder">Zawar FTC</div>
-                    <p>Located in Udaipur, Rajasthan. Specializes in base metal exploration training with access to active mining areas</p>
-                </div>
-                
-                <div class="center-card">
-                    <h4>Field Training Center - Kuju</h4>
-                    <div class="image-placeholder">Kuju FTC</div>
-                    <p>Jharkhand center focusing on coal exploration techniques and sedimentary basin analysis</p>
-                </div>
-                
-                <div class="center-card">
-                    <h4>Field Training Center - Raipur</h4>
-                    <div class="image-placeholder">Raipur FTC</div>
-                    <p>Chhattisgarh facility specializing in iron ore and bauxite exploration methodologies</p>
-                </div>
-                
-                <div class="center-card">
-                    <h4>Regional Centers</h4>
-                    <div class="image-placeholder">Regional Facilities</div>
-                    <p>Training facilities at all 6 regional headquarters for location-specific programs</p>
-                </div>
-                
-                <div class="center-card">
-                    <h4>Laboratory Training</h4>
-                    <div class="image-placeholder">Lab Facilities</div>
-                    <p>Specialized training at NCEGR facilities in Kolkata, Faridabad, and Bengaluru</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Training Facilities -->
-        <div class="facilities-section">
-            <div class="section-title">
-                <h2>Training Infrastructure</h2>
-                <p>World-class facilities for comprehensive learning</p>
-            </div>
-            
-            <div class="facility-grid">
-                <div class="facility-item">
-                    <div class="facility-icon">🏫</div>
-                    <h4>Lecture Halls</h4>
-                    <p>Modern classrooms with audio-visual aids</p>
-                </div>
-                
-                <div class="facility-item">
-                    <div class="facility-icon">🔬</div>
-                    <h4>Laboratories</h4>
-                    <p>Petrology, mineralogy, and geochemistry labs</p>
-                </div>
-                
-                <div class="facility-item">
-                    <div class="facility-icon">💻</div>
-                    <h4>Computer Labs</h4>
-                    <p>GIS, remote sensing, and modeling software</p>
-                </div>
-                
-                <div class="facility-item">
-                    <div class="facility-icon">📚</div>
-                    <h4>Library</h4>
-                    <p>Extensive collection of geoscience literature</p>
-                </div>
-                
-                <div class="facility-item">
-                    <div class="facility-icon">🏨</div>
-                    <h4>Hostel</h4>
-                    <p>Accommodation for 200+ trainees</p>
-                </div>
-                
-                <div class="facility-item">
-                    <div class="facility-icon">🍽️</div>
-                    <h4>Dining Hall</h4>
-                    <p>Modern cafeteria facilities</p>
-                </div>
-                
-                <div class="facility-item">
-                    <div class="facility-icon">🏃</div>
-                    <h4>Recreation</h4>
-                    <p>Sports and fitness facilities</p>
-                </div>
-                
-                <div class="facility-item">
-                    <div class="facility-icon">🚐</div>
-                    <h4>Field Vehicles</h4>
-                    <p>Fleet for field training exercises</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- International Programs -->
-        <div class="international-programs">
-            <div class="section-title" style="color: white;">
-                <h2>International Training Programs</h2>
-                <p style="color: rgba(255,255,255,0.9);">Global capacity building initiatives</p>
-            </div>
-            
-            <div class="int-program-grid">
-                <div class="int-program-card">
-                    <h4>ITEC Programme <span class="badge">MEA Funded</span></h4>
-                    <p>Under Ministry of External Affairs, GSI conducts specialized courses for international geoscientists in Remote Sensing & GIS applications in mineral exploration</p>
-                    <ul style="margin-top: 15px; list-style: none;">
-                        <li>• Duration: 6-8 weeks</li>
-                        <li>• Participants: 20-25 per batch</li>
-                        <li>• Countries: Africa, Asia, Latin America</li>
-                    </ul>
-                </div>
-                
-                <div class="int-program-card">
-                    <h4>NNRMS Programme <span class="badge">ISRO</span></h4>
-                    <p>National Natural Resources Management System program in collaboration with ISRO for disaster management applications</p>
-                    <ul style="margin-top: 15px; list-style: none;">
-                        <li>• Remote Sensing in Mineral Exploration</li>
-                        <li>• Geoinformatics in Disaster Management</li>
-                        <li>• Hyperspectral Applications</li>
-                    </ul>
-                </div>
-                
-                <div class="int-program-card">
-                    <h4>Customized Training <span class="badge">On Demand</span></h4>
-                    <p>Tailored programs for organizations like ONGC, Coal India, State DMGs, and international geological surveys</p>
-                    <ul style="margin-top: 15px; list-style: none;">
-                        <li>• ONGC Field Geological Mapping</li>
-                        <li>• WAPCOS Geotechnical Training</li>
-                        <li>• International Collaborations</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Capacity Building Timeline -->
-        <div class="capacity-building">
-            <div class="section-title">
-                <h2>Capacity Building Journey</h2>
-                <p>Evolution of human resource development in GSI</p>
-            </div>
-            
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-year">2006</div>
-                    <div class="timeline-content">
-                        <h4>Bulk Recruitment Initiative</h4>
-                        <p>Started large-scale induction to address depleting personnel strength in scientific streams</p>
+            <div class="container">
+                <!-- HR Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>6,718</h3>
+                        <p>Total Employees</p>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);">
+                        <h3>50+</h3>
+                        <p>Training Courses</p>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #ff5722 0%, #ff7043 100%);">
+                        <h3>6</h3>
+                        <p>Regional Centers</p>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);">
+                        <h3>1000+</h3>
+                        <p>Annual Trainees</p>
                     </div>
                 </div>
                 
-                <div class="timeline-item">
-                    <div class="timeline-year">2016</div>
-                    <div class="timeline-content">
-                        <h4>New Transfer Policy</h4>
-                        <p>Implemented comprehensive Transfer/Placement Policy for Grade A & B officers</p>
+                <!-- Training Programs -->
+                <div class="card">
+                    <h2 style="color: #1a237e; margin-bottom: 20px;">Training Programs Offered</h2>
+                    <div class="grid">
+                        <div style="background: #e3f2fd; padding: 25px; border-radius: 8px;">
+                            <h3 style="color: #1a237e; margin-bottom: 15px;">Induction Level</h3>
+                            <ul style="list-style: none;">
+                                <li>📚 Orientation for Geologists</li>
+                                <li>📚 Orientation for Geophysicists</li>
+                                <li>📚 Orientation for Chemists</li>
+                                <li>📚 Administrative Training</li>
+                                <li>📚 Office Procedures</li>
+                            </ul>
+                        </div>
+                        <div style="background: #e8f5e9; padding: 25px; border-radius: 8px;">
+                            <h3 style="color: #1a237e; margin-bottom: 15px;">Advanced Technical</h3>
+                            <ul style="list-style: none;">
+                                <li>📚 3D Modeling (SURPAC)</li>
+                                <li>📚 GEOSOFT Applications</li>
+                                <li>📚 Remote Sensing & GIS</li>
+                                <li>📚 Geochemical Analysis</li>
+                                <li>📚 Airborne Surveys</li>
+                            </ul>
+                        </div>
+                        <div style="background: #fff3e0; padding: 25px; border-radius: 8px;">
+                            <h3 style="color: #1a237e; margin-bottom: 15px;">Specialized Programs</h3>
+                            <ul style="list-style: none;">
+                                <li>📚 Diamond Exploration</li>
+                                <li>📚 Gold Exploration</li>
+                                <li>📚 Base Metal Studies</li>
+                                <li>📚 PGE Exploration</li>
+                                <li>📚 Geotechnical Work</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="timeline-item">
-                    <div class="timeline-year">2017</div>
-                    <div class="timeline-content">
-                        <h4>Organized Group A Service</h4>
-                        <p>All Group "A" Scientific & Technical streams declared as Organized Service</p>
+                <!-- Training Infrastructure -->
+                <div class="card">
+                    <h2 style="color: #1a237e; margin-bottom: 20px;">Training Infrastructure</h2>
+                    <p>GSI Training Institute established in 1976 with headquarters at Hyderabad</p>
+                    <div class="grid" style="margin-top: 30px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 48px; color: #3949ab; margin-bottom: 10px;">🏫</div>
+                            <h4>TI Headquarters</h4>
+                            <p>Bandlaguda, Hyderabad</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 48px; color: #3949ab; margin-bottom: 10px;">🏔️</div>
+                            <h4>FTC Zawar</h4>
+                            <p>Base metal training</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 48px; color: #3949ab; margin-bottom: 10px;">⛏️</div>
+                            <h4>FTC Kuju</h4>
+                            <p>Coal exploration</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 48px; color: #3949ab; margin-bottom: 10px;">🪨</div>
+                            <h4>FTC Raipur</h4>
+                            <p>Iron ore & bauxite</p>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="timeline-item">
-                    <div class="timeline-year">2020</div>
-                    <div class="timeline-content">
-                        <h4>Digital Training Era</h4>
-                        <p>Launch of online training modules and virtual classroom sessions</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- HR Policies -->
-        <div class="org-structure">
-            <div class="section-title">
-                <h2>Human Resource Policies</h2>
-                <p>Progressive policies for employee welfare and development</p>
-            </div>
-            
-            <div class="hr-policy-grid">
-                <div class="policy-card">
-                    <h4>Recruitment & Career Progression</h4>
-                    <ul>
-                        <li>Merit-based recruitment through UPSC</li>
-                        <li>Structured career progression paths</li>
-                        <li>Time-bound promotions</li>
-                        <li>Specialization opportunities</li>
-                        <li>Performance-based incentives</li>
-                    </ul>
-                </div>
-                
-                <div class="policy-card">
-                    <h4>Training & Development</h4>
-                    <ul>
-                        <li>Mandatory induction training</li>
-                        <li>Periodic refresher courses</li>
-                        <li>Promotion-linked training</li>
-                        <li>International training opportunities</li>
-                        <li>Sponsorship for higher education</li>
-                    </ul>
-                </div>
-                
-                <div class="policy-card">
-                    <h4>Welfare Measures</h4>
-                    <ul>
-                        <li>Comprehensive medical coverage</li>
-                        <li>Housing facilities</li>
-                        <li>Education allowance</li>
-                        <li>Leave travel concession</li>
-                        <li>Retirement benefits</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="chart-container">
-                <canvas id="growthChart"></canvas>
-            </div>
-        </div>
-        
-        <!-- Key Initiatives -->
-        <div class="training-section">
-            <div class="section-title">
-                <h2>Special Initiatives</h2>
-                <p>Programs for excellence and innovation</p>
-            </div>
-            
-            <div class="training-grid">
-                <div class="training-card">
-                    <div class="training-header" style="background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);">
-                        <h3>Distinguished Instructor Program</h3>
-                    </div>
-                    <div class="training-body">
-                        <p>Inviting international experts for specialized courses</p>
-                        <ul style="margin-top: 15px;">
-                            <li>Prof. Oldenberg - Geophysical Modeling</li>
-                            <li>International faculty exchanges</li>
-                            <li>Collaborative research programs</li>
-                            <li>Joint certification courses</li>
-                        </ul>
+                <!-- International Programs -->
+                <div class="card" style="background: linear-gradient(135deg, #1a237e 0%, #283593 100%); color: white;">
+                    <h2 style="margin-bottom: 20px;">International Training Programs</h2>
+                    <div class="grid">
+                        <div style="background: rgba(255,255,255,0.1); padding: 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);">
+                            <h3>ITEC Programme <span class="badge">MEA Funded</span></h3>
+                            <p style="margin-top: 15px;">Specialized courses for international geoscientists in Remote Sensing & GIS applications</p>
+                            <ul style="list-style: none; margin-top: 15px;">
+                                <li>• Duration: 6-8 weeks</li>
+                                <li>• Participants: 20-25 per batch</li>
+                                <li>• Countries: Africa, Asia, Latin America</li>
+                            </ul>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.1); padding: 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);">
+                            <h3>NNRMS Programme <span class="badge">ISRO</span></h3>
+                            <p style="margin-top: 15px;">Collaboration with ISRO for disaster management applications</p>
+                            <ul style="list-style: none; margin-top: 15px;">
+                                <li>• Remote Sensing in Minerals</li>
+                                <li>• Disaster Management GIS</li>
+                                <li>• Hyperspectral Applications</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="training-card">
-                    <div class="training-header" style="background: linear-gradient(135deg, #00bcd4 0%, #26c6da 100%);">
-                        <h3>Skill Development Programs</h3>
-                    </div>
-                    <div class="training-body">
-                        <p>Upgrading technical competencies</p>
-                        <ul style="margin-top: 15px;">
-                            <li>AI/ML in mineral exploration</li>
-                            <li>Drone technology applications</li>
-                            <li>Big data analytics</li>
-                            <li>Cloud computing platforms</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <div class="training-card">
-                    <div class="training-header" style="background: linear-gradient(135deg, #795548 0%, #8d6e63 100%);">
-                        <h3>Leadership Development</h3>
-                    </div>
-                    <div class="training-body">
-                        <p>Grooming future leaders</p>
-                        <ul style="margin-top: 15px;">
-                            <li>Executive development programs</li>
-                            <li>Strategic planning workshops</li>
-                            <li>Change management training</li>
-                            <li>Innovation and entrepreneurship</li>
-                        </ul>
+                <!-- Staff Distribution -->
+                <div class="card">
+                    <h2 style="color: #1a237e; margin-bottom: 20px;">Staff Distribution</h2>
+                    <div class="chart-container">
+                        <canvas id="staffChart"></canvas>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- Details Modal -->
-    <div id="detailsModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h3 id="modalTitle"></h3>
-            <div id="modalContent"></div>
-        </div>
+        </section>
     </div>
     
     <script>
-        // Initialize charts on load
-        window.onload = function() {
-            initStaffChart();
-            initGrowthChart();
-            animateStats();
-        };
+        // Navigation functionality
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Close mobile menu if open
+            document.getElementById('navMenu').classList.remove('active');
+            
+            // Initialize charts/maps when sections are shown
+            if (sectionId === 'dashboard') {
+                setTimeout(() => initResourceChart(), 100);
+            } else if (sectionId === 'gallery') {
+                setTimeout(() => initMap(), 100);
+            } else if (sectionId === 'achievements') {
+                setTimeout(() => initTechChart(), 100);
+            } else if (sectionId === 'training') {
+                setTimeout(() => initStaffChart(), 100);
+            }
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
         
-        // Animate statistics
-        function animateStats() {
-            const stats = document.querySelectorAll('.stat-card h3');
-            stats.forEach(stat => {
-                const target = parseInt(stat.innerText.replace(/[^0-9]/g, ''));
-                let current = 0;
-                const increment = target / 50;
-                const timer = setInterval(() => {
-                    current += increment;
-                    if (current >= target) {
-                        current = target;
-                        clearInterval(timer);
+        // Gallery tab functionality
+        function showGalleryTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabId + '-tab').classList.add('active');
+            
+            // Update buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Initialize map if maps tab
+            if (tabId === 'maps' && !window.mapInitialized) {
+                setTimeout(() => initMap(), 100);
+            }
+        }
+        
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            document.getElementById('navMenu').classList.toggle('active');
+        }
+        
+        // Initialize Charts
+        function initResourceChart() {
+            const ctx = document.getElementById('resourceChart');
+            if (!ctx) return;
+            
+            new Chart(ctx.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Coal', 'Iron Ore', 'Limestone', 'Other Minerals'],
+                    datasets: [{
+                        data: [306596, 14532, 93039, 50000],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(75, 192, 192, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Major Mineral Resources (in Mt)'
+                        }
                     }
-                    stat.innerText = Math.floor(current) + (stat.innerText.includes('+') ? '+' : '');
-                }, 30);
+                }
             });
         }
         
-        // Staff distribution chart
-        function initStaffChart() {
-            const ctx = document.getElementById('staffChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
+        function initTechChart() {
+            const ctx = document.getElementById('techChart');
+            if (!ctx) return;
+            
+            new Chart(ctx.getContext('2d'), {
+                type: 'bar',
                 data: {
-                    labels: ['Geologists', 'Geophysicists', 'Chemists', 'Engineers', 'Administrative', 'Support Staff'],
+                    labels: ['Mapping', 'Marine Surveys', 'Airborne', 'Laboratory', 'Digital Systems'],
+                    datasets: [{
+                        label: '1950-1980',
+                        data: [40, 10, 5, 20, 0],
+                        backgroundColor: 'rgba(255, 193, 7, 0.8)'
+                    }, {
+                        label: '1980-2000',
+                        data: [70, 40, 30, 50, 20],
+                        backgroundColor: 'rgba(33, 150, 243, 0.8)'
+                    }, {
+                        label: '2000-2020',
+                        data: [95, 80, 70, 85, 75],
+                        backgroundColor: 'rgba(76, 175, 80, 0.8)'
+                    }, {
+                        label: '2020-Present',
+                        data: [100, 95, 90, 95, 100],
+                        backgroundColor: 'rgba(156, 39, 176, 0.8)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Technology Adoption Progress (%)'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function initStaffChart() {
+            const ctx = document.getElementById('staffChart');
+            if (!ctx) return;
+            
+            new Chart(ctx.getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: ['Geologists', 'Geophysicists', 'Chemists', 'Engineers', 'Administrative', 'Support'],
                     datasets: [{
                         data: [2800, 800, 600, 500, 1200, 818],
                         backgroundColor: [
@@ -1159,9 +1342,7 @@
                             '#fb8c00',
                             '#8e24aa',
                             '#546e7a'
-                        ],
-                        borderWidth: 2,
-                        borderColor: '#fff'
+                        ]
                     }]
                 },
                 options: {
@@ -1170,191 +1351,57 @@
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Staff Distribution by Category (Total: 6,718)',
-                            font: { size: 16 }
-                        },
-                        legend: {
-                            position: 'bottom',
-                            labels: { padding: 15 }
-                        }
-                    }
-                }
-            });
-        }
-        
-        // Personnel growth chart
-        function initGrowthChart() {
-            const ctx = document.getElementById('growthChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['2006', '2008', '2010', '2012', '2014', '2016', '2018', '2020', '2022', '2024'],
-                    datasets: [{
-                        label: 'Total Personnel',
-                        data: [4500, 4800, 5200, 5500, 5800, 6200, 6500, 6600, 6700, 6718],
-                        borderColor: '#3949ab',
-                        backgroundColor: 'rgba(57, 73, 171, 0.1)',
-                        tension: 0.4,
-                        borderWidth: 3
-                    }, {
-                        label: 'Scientific Staff',
-                        data: [3200, 3400, 3700, 3900, 4100, 4400, 4600, 4700, 4800, 4900],
-                        borderColor: '#43a047',
-                        backgroundColor: 'rgba(67, 160, 71, 0.1)',
-                        tension: 0.4,
-                        borderWidth: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Personnel Growth Since Bulk Recruitment Initiative',
-                            font: { size: 16 }
+                            text: 'Staff Distribution (Total: 6,718)'
                         },
                         legend: {
                             position: 'bottom'
                         }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            title: {
-                                display: true,
-                                text: 'Number of Employees'
-                            }
-                        }
                     }
                 }
             });
         }
         
-        // Show details modal
-        function showDetails(type) {
-            const modal = document.getElementById('detailsModal');
-            const title = document.getElementById('modalTitle');
-            const content = document.getElementById('modalContent');
+        // Initialize Leaflet Map
+        function initMap() {
+            if (window.mapInitialized) return;
             
-            const details = {
-                employees: {
-                    title: 'Employee Distribution',
-                    content: `
-                        <div class="image-placeholder">GSI Workforce</div>
-                        <h4>Current Strength: 6,718</h4>
-                        <p style="margin-top: 15px;">GSI's workforce comprises highly skilled professionals across various disciplines:</p>
-                        <ul style="margin-top: 15px;">
-                            <li><strong>Geologists:</strong> 2,800 (41.7%)</li>
-                            <li><strong>Geophysicists:</strong> 800 (11.9%)</li>
-                            <li><strong>Chemists:</strong> 600 (8.9%)</li>
-                            <li><strong>Engineers:</strong> 500 (7.4%)</li>
-                            <li><strong>Administrative:</strong> 1,200 (17.9%)</li>
-                            <li><strong>Support Staff:</strong> 818 (12.2%)</li>
-                        </ul>
-                        <h4 style="margin-top: 20px;">Grade-wise Distribution</h4>
-                        <ul style="margin-top: 15px;">
-                            <li>Group A (Gazetted): 3,500+</li>
-                            <li>Group B (Gazetted): 1,800+</li>
-                            <li>Group B (Non-Gazetted): 800+</li>
-                            <li>Group C: 600+</li>
-                        </ul>
-                    `
-                },
-                training: {
-                    title: 'Training Programs Portfolio',
-                    content: `
-                        <div class="image-placeholder">Training Activities</div>
-                        <h4>Comprehensive Training Ecosystem</h4>
-                        <p style="margin-top: 15px;">GSI offers 50+ specialized courses annually:</p>
-                        <h5 style="margin-top: 20px;">Core Programs:</h5>
-                        <ul style="margin-top: 10px;">
-                            <li>Induction courses for all new recruits</li>
-                            <li>Basic, Refresher & Advanced technical courses</li>
-                            <li>Strategic mineral exploration programs</li>
-                            <li>Digital technology integration courses</li>
-                            <li>Laboratory management systems</li>
-                        </ul>
-                        <h5 style="margin-top: 20px;">Special Programs:</h5>
-                        <ul style="margin-top: 10px;">
-                            <li>ITEC courses for international participants</li>
-                            <li>NNRMS programs with ISRO</li>
-                            <li>Customized training for ONGC</li>
-                            <li>Management development programs</li>
-                            <li>Field training camps (FTCs)</li>
-                        </ul>
-                    `
-                },
-                centers: {
-                    title: 'Regional Training Infrastructure',
-                    content: `
-                        <div class="image-placeholder">Training Centers Map</div>
-                        <h4>Strategic Locations Across India</h4>
-                        <div style="margin-top: 20px;">
-                            <h5>1. TI Headquarters - Hyderabad</h5>
-                            <p>Main campus at Bandlaguda with comprehensive facilities</p>
-                            
-                            <h5 style="margin-top: 15px;">2. Field Training Centers:</h5>
-                            <ul style="margin-top: 10px;">
-                                <li><strong>Zawar (Rajasthan):</strong> Base metal exploration</li>
-                                <li><strong>Kuju (Jharkhand):</strong> Coal exploration</li>
-                                <li><strong>Raipur (Chhattisgarh):</strong> Iron ore & bauxite</li>
-                            </ul>
-                            
-                            <h5 style="margin-top: 15px;">3. Regional Facilities:</h5>
-                            <p>Training infrastructure at all 6 regional headquarters</p>
-                            
-                            <h5 style="margin-top: 15px;">4. Laboratory Training:</h5>
-                            <p>Specialized programs at NCEGR facilities in Kolkata, Faridabad & Bengaluru</p>
-                        </div>
-                    `
-                },
-                trainees: {
-                    title: 'Annual Training Statistics',
-                    content: `
-                        <div class="image-placeholder">Training Sessions</div>
-                        <h4>Training Output: 1000+ Participants Annually</h4>
-                        <div style="margin-top: 20px;">
-                            <h5>Participant Categories:</h5>
-                            <ul style="margin-top: 10px;">
-                                <li>New inductees: 300-400</li>
-                                <li>In-service training: 400-500</li>
-                                <li>External organizations: 100-150</li>
-                                <li>International participants: 50-75</li>
-                            </ul>
-                            
-                            <h5 style="margin-top: 20px;">Training Duration:</h5>
-                            <ul style="margin-top: 10px;">
-                                <li>Short courses: 1-2 weeks</li>
-                                <li>Regular courses: 4-6 weeks</li>
-                                <li>Advanced programs: 8-12 weeks</li>
-                                <li>Induction training: 3-6 months</li>
-                            </ul>
-                            
-                            <h5 style="margin-top: 20px;">Success Rate:</h5>
-                            <p>95%+ completion rate with certification</p>
-                        </div>
-                    `
-                }
-            };
+            const map = L.map('regionalMap').setView([23.5937, 78.9629], 5);
             
-            const data = details[type];
-            title.textContent = data.title;
-            content.innerHTML = data.content;
-            modal.style.display = 'block';
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            // Add markers for offices
+            const offices = [
+                {name: "Central HQ - Kolkata", lat: 22.5726, lng: 88.3639, type: "hq"},
+                {name: "Northern Region - Lucknow", lat: 26.8467, lng: 80.9462, type: "regional"},
+                {name: "Southern Region - Hyderabad", lat: 17.3850, lng: 78.4867, type: "regional"},
+                {name: "Western Region - Jaipur", lat: 26.9124, lng: 75.7873, type: "regional"},
+                {name: "Central Region - Nagpur", lat: 21.1458, lng: 79.0882, type: "regional"},
+                {name: "North-Eastern Region - Shillong", lat: 25.5788, lng: 91.8933, type: "regional"}
+            ];
+            
+            offices.forEach(office => {
+                let markerColor = office.type === 'hq' ? 'darkblue' : 'red';
+                
+                L.circleMarker([office.lat, office.lng], {
+                    radius: office.type === 'hq' ? 12 : 8,
+                    fillColor: markerColor,
+                    color: 'white',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).addTo(map).bindPopup(`<strong>${office.name}</strong>`);
+            });
+            
+            window.mapInitialized = true;
         }
         
-        function closeModal() {
-            document.getElementById('detailsModal').style.display = 'none';
-        }
-        
-        // Close modal on outside click
-        window.onclick = function(event) {
-            const modal = document.getElementById('detailsModal');
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
+        // Initialize on load
+        window.onload = function() {
+            // Initialize first section
+            setTimeout(() => initResourceChart(), 100);
+        };
     </script>
 </body>
 </html>
