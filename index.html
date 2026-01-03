@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSI Training & Human Resources</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .nav-links a {
+            background: white;
+            color: #1a237e;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .hero-section {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .hero-section h2 {
+            color: #1a237e;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #3949ab 0%, #5c6bc0 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        
+        .stat-card h3 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .stat-card p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .org-structure {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .org-chart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+        }
+        
+        .org-level {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .org-box {
+            background: #f8f9fa;
+            border: 2px solid #3949ab;
+            padding: 20px;
+            border-radius: 8px;
+            min-width: 200px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .org-box:hover {
+            background: #e3f2fd;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .org-box.main {
+            background: #3949ab;
+            color: white;
+        }
+        
+        .org-box h4 {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+        
+        .org-box p {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .training-section {
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .training-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .training-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .training-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .training-header {
+            background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+            color: white;
+            padding: 25px;
+        }
+        
+        .training-header h3 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+        
+        .training-body {
+            padding: 25px;
+        }
+        
+        .training-body ul {
+            list-style: none;
+        }
+        
+        .training-body li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        
+        .training-body li:last-child {
+            border-bottom: none;
+        }
+        
+        .training-body li::before {
+            content: '📚';
+            margin-right: 10px;
+        }
+        
+        .course-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .category-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid #3949ab;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .category-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .category-card h4 {
+            color: #1a237e;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .category-icon {
+            font-size: 24px;
+        }
+        
+        .regional-centers {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .centers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .center-card {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8eaf6 100%);
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .center-card:hover {
+            background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+            transform: scale(1.02);
+        }
+        
+        .center-card h4 {
+            color: #1a237e;
+            margin-bottom: 15px;
+        }
+        
+        .center-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .facilities-section {
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .facility-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .facility-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .facility-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .facility-icon {
+            font-size: 36px;
+            margin-bottom: 15px;
+            color: #3949ab;
+        }
+        
+        .capacity-building {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+            margin-top: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 3px;
+            height: 100%;
+            background: #3949ab;
+            transform: translateX(-50%);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding: 20px;
+            margin-bottom: 20px;
+            width: 48%;
+        }
+        
+        .timeline-item:nth-child(odd) {
+            left: 0;
+        }
+        
+        .timeline-item:nth-child(even) {
+            left: 52%;
+        }
+        
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-year {
+            position: absolute;
+            top: 20px;
+            font-weight: bold;
+            color: #1a237e;
+        }
+        
+        .timeline-item:nth-child(odd) .timeline-year {
+            right: -70px;
+        }
+        
+        .timeline-item:nth-child(even) .timeline-year {
+            left: -70px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 30px 0;
+        }
+        
+        .international-programs {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        
+        .int-program-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .int-program-card {
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s;
+        }
+        
+        .int-program-card:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-3px);
+        }
+        
+        .int-program-card h4 {
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .int-program-card p {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title h2 {
+            color: #1a237e;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+        
+        .section-title p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close:hover {
+            color: #333;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #4caf50;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        
+        .image-placeholder {
+            background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
+            height: 200px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .image-placeholder::before {
+            content: '🏛️';
+            font-size: 48px;
+            position: absolute;
+            opacity: 0.3;
+        }
+        
+        @media (max-width: 768px) {
+            .timeline-item {
+                width: 100%;
+                left: 0 !important;
+            }
+            
+            .timeline::before {
+                left: 20px;
+            }
+            
+            .timeline-year {
+                position: static !important;
+                margin-bottom: 10px;
+            }
+        }
+        
+        .hr-policy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .policy-card {
+            background: #e3f2fd;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid #1a237e;
+        }
+        
+        .policy-card h4 {
+            color: #1a237e;
+            margin-bottom: 15px;
+        }
+        
+        .policy-card ul {
+            list-style: none;
+        }
+        
+        .policy-card li {
+            padding: 5px 0;
+        }
+        
+        .policy-card li::before {
+            content: '✓';
+            color: #4caf50;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>GSI Training & Human Resources</h1>
+        <p>Building Capacity for Geoscientific Excellence</p>
+        <div class="nav-links">
+            <a href="gsi_dashboard.html">Main Dashboard</a>
+            <a href="gsi_visual_gallery.html">Visual Gallery</a>
+            <a href="gsi_achievements.html">Achievements</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Hero Section with Statistics -->
+        <div class="hero-section">
+            <h2>GSI Training Institute</h2>
+            <p>Established in 1976 • A premier institution for geoscientific training in India</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card" onclick="showDetails('employees')">
+                    <h3>6,718</h3>
+                    <p>Total Employees</p>
+                </div>
+                <div class="stat-card" onclick="showDetails('training')">
+                    <h3>50+</h3>
+                    <p>Training Courses</p>
+                </div>
+                <div class="stat-card" onclick="showDetails('centers')">
+                    <h3>6</h3>
+                    <p>Regional Centers</p>
+                </div>
+                <div class="stat-card" onclick="showDetails('trainees')">
+                    <h3>1000+</h3>
+                    <p>Annual Trainees</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Organizational Structure -->
+        <div class="org-structure">
+            <div class="section-title">
+                <h2>Organizational Structure</h2>
+                <p>Hierarchical arrangement ensuring efficient functioning</p>
+            </div>
+            
+            <div class="org-chart">
+                <div class="org-level">
+                    <div class="org-box main">
+                        <h4>Director General</h4>
+                        <p>Central Headquarters, Kolkata</p>
+                    </div>
+                </div>
+                
+                <div class="org-level">
+                    <div class="org-box">
+                        <h4>Additional Director Generals</h4>
+                        <p>Mission Heads & Regional Directors</p>
+                    </div>
+                    <div class="org-box">
+                        <h4>Deputy Director Generals</h4>
+                        <p>Divisional Heads</p>
+                    </div>
+                </div>
+                
+                <div class="org-level">
+                    <div class="org-box">
+                        <h4>Directors</h4>
+                        <p>Operational Units</p>
+                    </div>
+                    <div class="org-box">
+                        <h4>Deputy Directors</h4>
+                        <p>Field Units</p>
+                    </div>
+                    <div class="org-box">
+                        <h4>Assistant Directors</h4>
+                        <p>Project Leaders</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="staffChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Training Programs -->
+        <div class="training-section">
+            <div class="section-title">
+                <h2>Training Programs Offered</h2>
+                <p>Comprehensive courses for all levels of geoscientific expertise</p>
+            </div>
+            
+            <div class="training-grid">
+                <div class="training-card">
+                    <div class="training-header">
+                        <h3>Induction Level Courses</h3>
+                        <p>For new recruits</p>
+                    </div>
+                    <div class="training-body">
+                        <ul>
+                            <li>Orientation Course for Geologists</li>
+                            <li>Orientation Course for Geophysicists</li>
+                            <li>Orientation Course for Chemists</li>
+                            <li>Orientation Course for Engineers</li>
+                            <li>Administrative Streams Training</li>
+                            <li>Office Procedures & Finance</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="training-card">
+                    <div class="training-header" style="background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);">
+                        <h3>Advanced Technical Courses</h3>
+                        <p>Specialized training</p>
+                    </div>
+                    <div class="training-body">
+                        <ul>
+                            <li>Conceptual Modeling in Mineral Exploration</li>
+                            <li>3D Modeling using SURPAC</li>
+                            <li>GEOSOFT for Gravity & Magnetic Data</li>
+                            <li>Remote Sensing & GIS Applications</li>
+                            <li>Geochemical Data Processing</li>
+                            <li>Airborne Survey Interpretation</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="training-card">
+                    <div class="training-header" style="background: linear-gradient(135deg, #ff5722 0%, #ff7043 100%);">
+                        <h3>Specialized Programs</h3>
+                        <p>Domain expertise</p>
+                    </div>
+                    <div class="training-body">
+                        <ul>
+                            <li>Diamond Exploration Techniques</li>
+                            <li>Gold Exploration Methods</li>
+                            <li>Base Metal Exploration</li>
+                            <li>PGE Exploration Strategies</li>
+                            <li>Coal & Lignite Assessment</li>
+                            <li>Geotechnical Investigations</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Course Categories -->
+        <div class="facilities-section">
+            <div class="section-title">
+                <h2>Course Categories</h2>
+                <p>Diverse range of training programs</p>
+            </div>
+            
+            <div class="course-categories">
+                <div class="category-card">
+                    <h4><span class="category-icon">🗺️</span>Geological Mapping</h4>
+                    <ul>
+                        <li>Systematic Geological Mapping</li>
+                        <li>Field Geological Techniques</li>
+                        <li>Structural Geology & Shear Zones</li>
+                        <li>High Grade Metamorphic Terrain</li>
+                        <li>Quaternary & Paleoclimatic Studies</li>
+                    </ul>
+                </div>
+                
+                <div class="category-card">
+                    <h4><span class="category-icon">💻</span>Digital Technologies</h4>
+                    <ul>
+                        <li>Geographic Information System (GIS)</li>
+                        <li>Remote Sensing Applications</li>
+                        <li>Digital Image Processing</li>
+                        <li>Surveying using DGPS & Total Station</li>
+                        <li>Mobile Apps for Field Mapping</li>
+                    </ul>
+                </div>
+                
+                <div class="category-card">
+                    <h4><span class="category-icon">🔬</span>Laboratory Techniques</h4>
+                    <ul>
+                        <li>EPMA Techniques</li>
+                        <li>Isotope Geochronology</li>
+                        <li>Fluid Inclusion Studies</li>
+                        <li>Raman Spectroscopy</li>
+                        <li>Precious Metal Analysis</li>
+                    </ul>
+                </div>
+                
+                <div class="category-card">
+                    <h4><span class="category-icon">🌊</span>Marine & Airborne</h4>
+                    <ul>
+                        <li>Marine Survey Techniques</li>
+                        <li>Airborne Geophysical Surveys</li>
+                        <li>Multi-channel Seismic</li>
+                        <li>Remote Sensing in Marine Domain</li>
+                        <li>Coastal Zone Management</li>
+                    </ul>
+                </div>
+                
+                <div class="category-card">
+                    <h4><span class="category-icon">⚒️</span>Mineral Exploration</h4>
+                    <ul>
+                        <li>Strategic Mineral Resources</li>
+                        <li>Critical Mineral Exploration</li>
+                        <li>Industrial & Fertilizer Minerals</li>
+                        <li>Geochemical Exploration</li>
+                        <li>Geophysical Methods</li>
+                    </ul>
+                </div>
+                
+                <div class="category-card">
+                    <h4><span class="category-icon">📊</span>Management Programs</h4>
+                    <ul>
+                        <li>Management Development Programs</li>
+                        <li>Project Management</li>
+                        <li>Financial Management</li>
+                        <li>Vigilance & Administration</li>
+                        <li>Hindi as Rajbhasha</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Regional Training Centers -->
+        <div class="regional-centers">
+            <div class="section-title">
+                <h2>Regional Training Centers</h2>
+                <p>Strategic locations across India</p>
+            </div>
+            
+            <div class="centers-grid">
+                <div class="center-card">
+                    <h4>TI Headquarters</h4>
+                    <div class="image-placeholder">Hyderabad Campus</div>
+                    <p>Main training facility at Bandlaguda, Hyderabad with state-of-the-art classrooms, laboratories, and accommodation facilities</p>
+                </div>
+                
+                <div class="center-card">
+                    <h4>Field Training Center - Zawar</h4>
+                    <div class="image-placeholder">Zawar FTC</div>
+                    <p>Located in Udaipur, Rajasthan. Specializes in base metal exploration training with access to active mining areas</p>
+                </div>
+                
+                <div class="center-card">
+                    <h4>Field Training Center - Kuju</h4>
+                    <div class="image-placeholder">Kuju FTC</div>
+                    <p>Jharkhand center focusing on coal exploration techniques and sedimentary basin analysis</p>
+                </div>
+                
+                <div class="center-card">
+                    <h4>Field Training Center - Raipur</h4>
+                    <div class="image-placeholder">Raipur FTC</div>
+                    <p>Chhattisgarh facility specializing in iron ore and bauxite exploration methodologies</p>
+                </div>
+                
+                <div class="center-card">
+                    <h4>Regional Centers</h4>
+                    <div class="image-placeholder">Regional Facilities</div>
+                    <p>Training facilities at all 6 regional headquarters for location-specific programs</p>
+                </div>
+                
+                <div class="center-card">
+                    <h4>Laboratory Training</h4>
+                    <div class="image-placeholder">Lab Facilities</div>
+                    <p>Specialized training at NCEGR facilities in Kolkata, Faridabad, and Bengaluru</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Training Facilities -->
+        <div class="facilities-section">
+            <div class="section-title">
+                <h2>Training Infrastructure</h2>
+                <p>World-class facilities for comprehensive learning</p>
+            </div>
+            
+            <div class="facility-grid">
+                <div class="facility-item">
+                    <div class="facility-icon">🏫</div>
+                    <h4>Lecture Halls</h4>
+                    <p>Modern classrooms with audio-visual aids</p>
+                </div>
+                
+                <div class="facility-item">
+                    <div class="facility-icon">🔬</div>
+                    <h4>Laboratories</h4>
+                    <p>Petrology, mineralogy, and geochemistry labs</p>
+                </div>
+                
+                <div class="facility-item">
+                    <div class="facility-icon">💻</div>
+                    <h4>Computer Labs</h4>
+                    <p>GIS, remote sensing, and modeling software</p>
+                </div>
+                
+                <div class="facility-item">
+                    <div class="facility-icon">📚</div>
+                    <h4>Library</h4>
+                    <p>Extensive collection of geoscience literature</p>
+                </div>
+                
+                <div class="facility-item">
+                    <div class="facility-icon">🏨</div>
+                    <h4>Hostel</h4>
+                    <p>Accommodation for 200+ trainees</p>
+                </div>
+                
+                <div class="facility-item">
+                    <div class="facility-icon">🍽️</div>
+                    <h4>Dining Hall</h4>
+                    <p>Modern cafeteria facilities</p>
+                </div>
+                
+                <div class="facility-item">
+                    <div class="facility-icon">🏃</div>
+                    <h4>Recreation</h4>
+                    <p>Sports and fitness facilities</p>
+                </div>
+                
+                <div class="facility-item">
+                    <div class="facility-icon">🚐</div>
+                    <h4>Field Vehicles</h4>
+                    <p>Fleet for field training exercises</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- International Programs -->
+        <div class="international-programs">
+            <div class="section-title" style="color: white;">
+                <h2>International Training Programs</h2>
+                <p style="color: rgba(255,255,255,0.9);">Global capacity building initiatives</p>
+            </div>
+            
+            <div class="int-program-grid">
+                <div class="int-program-card">
+                    <h4>ITEC Programme <span class="badge">MEA Funded</span></h4>
+                    <p>Under Ministry of External Affairs, GSI conducts specialized courses for international geoscientists in Remote Sensing & GIS applications in mineral exploration</p>
+                    <ul style="margin-top: 15px; list-style: none;">
+                        <li>• Duration: 6-8 weeks</li>
+                        <li>• Participants: 20-25 per batch</li>
+                        <li>• Countries: Africa, Asia, Latin America</li>
+                    </ul>
+                </div>
+                
+                <div class="int-program-card">
+                    <h4>NNRMS Programme <span class="badge">ISRO</span></h4>
+                    <p>National Natural Resources Management System program in collaboration with ISRO for disaster management applications</p>
+                    <ul style="margin-top: 15px; list-style: none;">
+                        <li>• Remote Sensing in Mineral Exploration</li>
+                        <li>• Geoinformatics in Disaster Management</li>
+                        <li>• Hyperspectral Applications</li>
+                    </ul>
+                </div>
+                
+                <div class="int-program-card">
+                    <h4>Customized Training <span class="badge">On Demand</span></h4>
+                    <p>Tailored programs for organizations like ONGC, Coal India, State DMGs, and international geological surveys</p>
+                    <ul style="margin-top: 15px; list-style: none;">
+                        <li>• ONGC Field Geological Mapping</li>
+                        <li>• WAPCOS Geotechnical Training</li>
+                        <li>• International Collaborations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Capacity Building Timeline -->
+        <div class="capacity-building">
+            <div class="section-title">
+                <h2>Capacity Building Journey</h2>
+                <p>Evolution of human resource development in GSI</p>
+            </div>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-year">2006</div>
+                    <div class="timeline-content">
+                        <h4>Bulk Recruitment Initiative</h4>
+                        <p>Started large-scale induction to address depleting personnel strength in scientific streams</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-year">2016</div>
+                    <div class="timeline-content">
+                        <h4>New Transfer Policy</h4>
+                        <p>Implemented comprehensive Transfer/Placement Policy for Grade A & B officers</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-year">2017</div>
+                    <div class="timeline-content">
+                        <h4>Organized Group A Service</h4>
+                        <p>All Group "A" Scientific & Technical streams declared as Organized Service</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-year">2020</div>
+                    <div class="timeline-content">
+                        <h4>Digital Training Era</h4>
+                        <p>Launch of online training modules and virtual classroom sessions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- HR Policies -->
+        <div class="org-structure">
+            <div class="section-title">
+                <h2>Human Resource Policies</h2>
+                <p>Progressive policies for employee welfare and development</p>
+            </div>
+            
+            <div class="hr-policy-grid">
+                <div class="policy-card">
+                    <h4>Recruitment & Career Progression</h4>
+                    <ul>
+                        <li>Merit-based recruitment through UPSC</li>
+                        <li>Structured career progression paths</li>
+                        <li>Time-bound promotions</li>
+                        <li>Specialization opportunities</li>
+                        <li>Performance-based incentives</li>
+                    </ul>
+                </div>
+                
+                <div class="policy-card">
+                    <h4>Training & Development</h4>
+                    <ul>
+                        <li>Mandatory induction training</li>
+                        <li>Periodic refresher courses</li>
+                        <li>Promotion-linked training</li>
+                        <li>International training opportunities</li>
+                        <li>Sponsorship for higher education</li>
+                    </ul>
+                </div>
+                
+                <div class="policy-card">
+                    <h4>Welfare Measures</h4>
+                    <ul>
+                        <li>Comprehensive medical coverage</li>
+                        <li>Housing facilities</li>
+                        <li>Education allowance</li>
+                        <li>Leave travel concession</li>
+                        <li>Retirement benefits</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="growthChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Key Initiatives -->
+        <div class="training-section">
+            <div class="section-title">
+                <h2>Special Initiatives</h2>
+                <p>Programs for excellence and innovation</p>
+            </div>
+            
+            <div class="training-grid">
+                <div class="training-card">
+                    <div class="training-header" style="background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);">
+                        <h3>Distinguished Instructor Program</h3>
+                    </div>
+                    <div class="training-body">
+                        <p>Inviting international experts for specialized courses</p>
+                        <ul style="margin-top: 15px;">
+                            <li>Prof. Oldenberg - Geophysical Modeling</li>
+                            <li>International faculty exchanges</li>
+                            <li>Collaborative research programs</li>
+                            <li>Joint certification courses</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="training-card">
+                    <div class="training-header" style="background: linear-gradient(135deg, #00bcd4 0%, #26c6da 100%);">
+                        <h3>Skill Development Programs</h3>
+                    </div>
+                    <div class="training-body">
+                        <p>Upgrading technical competencies</p>
+                        <ul style="margin-top: 15px;">
+                            <li>AI/ML in mineral exploration</li>
+                            <li>Drone technology applications</li>
+                            <li>Big data analytics</li>
+                            <li>Cloud computing platforms</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="training-card">
+                    <div class="training-header" style="background: linear-gradient(135deg, #795548 0%, #8d6e63 100%);">
+                        <h3>Leadership Development</h3>
+                    </div>
+                    <div class="training-body">
+                        <p>Grooming future leaders</p>
+                        <ul style="margin-top: 15px;">
+                            <li>Executive development programs</li>
+                            <li>Strategic planning workshops</li>
+                            <li>Change management training</li>
+                            <li>Innovation and entrepreneurship</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Details Modal -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle"></h3>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize charts on load
+        window.onload = function() {
+            initStaffChart();
+            initGrowthChart();
+            animateStats();
+        };
+        
+        // Animate statistics
+        function animateStats() {
+            const stats = document.querySelectorAll('.stat-card h3');
+            stats.forEach(stat => {
+                const target = parseInt(stat.innerText.replace(/[^0-9]/g, ''));
+                let current = 0;
+                const increment = target / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    stat.innerText = Math.floor(current) + (stat.innerText.includes('+') ? '+' : '');
+                }, 30);
+            });
+        }
+        
+        // Staff distribution chart
+        function initStaffChart() {
+            const ctx = document.getElementById('staffChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Geologists', 'Geophysicists', 'Chemists', 'Engineers', 'Administrative', 'Support Staff'],
+                    datasets: [{
+                        data: [2800, 800, 600, 500, 1200, 818],
+                        backgroundColor: [
+                            '#3949ab',
+                            '#1e88e5',
+                            '#43a047',
+                            '#fb8c00',
+                            '#8e24aa',
+                            '#546e7a'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Staff Distribution by Category (Total: 6,718)',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 15 }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Personnel growth chart
+        function initGrowthChart() {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2006', '2008', '2010', '2012', '2014', '2016', '2018', '2020', '2022', '2024'],
+                    datasets: [{
+                        label: 'Total Personnel',
+                        data: [4500, 4800, 5200, 5500, 5800, 6200, 6500, 6600, 6700, 6718],
+                        borderColor: '#3949ab',
+                        backgroundColor: 'rgba(57, 73, 171, 0.1)',
+                        tension: 0.4,
+                        borderWidth: 3
+                    }, {
+                        label: 'Scientific Staff',
+                        data: [3200, 3400, 3700, 3900, 4100, 4400, 4600, 4700, 4800, 4900],
+                        borderColor: '#43a047',
+                        backgroundColor: 'rgba(67, 160, 71, 0.1)',
+                        tension: 0.4,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Personnel Growth Since Bulk Recruitment Initiative',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'Number of Employees'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Show details modal
+        function showDetails(type) {
+            const modal = document.getElementById('detailsModal');
+            const title = document.getElementById('modalTitle');
+            const content = document.getElementById('modalContent');
+            
+            const details = {
+                employees: {
+                    title: 'Employee Distribution',
+                    content: `
+                        <div class="image-placeholder">GSI Workforce</div>
+                        <h4>Current Strength: 6,718</h4>
+                        <p style="margin-top: 15px;">GSI's workforce comprises highly skilled professionals across various disciplines:</p>
+                        <ul style="margin-top: 15px;">
+                            <li><strong>Geologists:</strong> 2,800 (41.7%)</li>
+                            <li><strong>Geophysicists:</strong> 800 (11.9%)</li>
+                            <li><strong>Chemists:</strong> 600 (8.9%)</li>
+                            <li><strong>Engineers:</strong> 500 (7.4%)</li>
+                            <li><strong>Administrative:</strong> 1,200 (17.9%)</li>
+                            <li><strong>Support Staff:</strong> 818 (12.2%)</li>
+                        </ul>
+                        <h4 style="margin-top: 20px;">Grade-wise Distribution</h4>
+                        <ul style="margin-top: 15px;">
+                            <li>Group A (Gazetted): 3,500+</li>
+                            <li>Group B (Gazetted): 1,800+</li>
+                            <li>Group B (Non-Gazetted): 800+</li>
+                            <li>Group C: 600+</li>
+                        </ul>
+                    `
+                },
+                training: {
+                    title: 'Training Programs Portfolio',
+                    content: `
+                        <div class="image-placeholder">Training Activities</div>
+                        <h4>Comprehensive Training Ecosystem</h4>
+                        <p style="margin-top: 15px;">GSI offers 50+ specialized courses annually:</p>
+                        <h5 style="margin-top: 20px;">Core Programs:</h5>
+                        <ul style="margin-top: 10px;">
+                            <li>Induction courses for all new recruits</li>
+                            <li>Basic, Refresher & Advanced technical courses</li>
+                            <li>Strategic mineral exploration programs</li>
+                            <li>Digital technology integration courses</li>
+                            <li>Laboratory management systems</li>
+                        </ul>
+                        <h5 style="margin-top: 20px;">Special Programs:</h5>
+                        <ul style="margin-top: 10px;">
+                            <li>ITEC courses for international participants</li>
+                            <li>NNRMS programs with ISRO</li>
+                            <li>Customized training for ONGC</li>
+                            <li>Management development programs</li>
+                            <li>Field training camps (FTCs)</li>
+                        </ul>
+                    `
+                },
+                centers: {
+                    title: 'Regional Training Infrastructure',
+                    content: `
+                        <div class="image-placeholder">Training Centers Map</div>
+                        <h4>Strategic Locations Across India</h4>
+                        <div style="margin-top: 20px;">
+                            <h5>1. TI Headquarters - Hyderabad</h5>
+                            <p>Main campus at Bandlaguda with comprehensive facilities</p>
+                            
+                            <h5 style="margin-top: 15px;">2. Field Training Centers:</h5>
+                            <ul style="margin-top: 10px;">
+                                <li><strong>Zawar (Rajasthan):</strong> Base metal exploration</li>
+                                <li><strong>Kuju (Jharkhand):</strong> Coal exploration</li>
+                                <li><strong>Raipur (Chhattisgarh):</strong> Iron ore & bauxite</li>
+                            </ul>
+                            
+                            <h5 style="margin-top: 15px;">3. Regional Facilities:</h5>
+                            <p>Training infrastructure at all 6 regional headquarters</p>
+                            
+                            <h5 style="margin-top: 15px;">4. Laboratory Training:</h5>
+                            <p>Specialized programs at NCEGR facilities in Kolkata, Faridabad & Bengaluru</p>
+                        </div>
+                    `
+                },
+                trainees: {
+                    title: 'Annual Training Statistics',
+                    content: `
+                        <div class="image-placeholder">Training Sessions</div>
+                        <h4>Training Output: 1000+ Participants Annually</h4>
+                        <div style="margin-top: 20px;">
+                            <h5>Participant Categories:</h5>
+                            <ul style="margin-top: 10px;">
+                                <li>New inductees: 300-400</li>
+                                <li>In-service training: 400-500</li>
+                                <li>External organizations: 100-150</li>
+                                <li>International participants: 50-75</li>
+                            </ul>
+                            
+                            <h5 style="margin-top: 20px;">Training Duration:</h5>
+                            <ul style="margin-top: 10px;">
+                                <li>Short courses: 1-2 weeks</li>
+                                <li>Regular courses: 4-6 weeks</li>
+                                <li>Advanced programs: 8-12 weeks</li>
+                                <li>Induction training: 3-6 months</li>
+                            </ul>
+                            
+                            <h5 style="margin-top: 20px;">Success Rate:</h5>
+                            <p>95%+ completion rate with certification</p>
+                        </div>
+                    `
+                }
+            };
+            
+            const data = details[type];
+            title.textContent = data.title;
+            content.innerHTML = data.content;
+            modal.style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+        }
+        
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('detailsModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
